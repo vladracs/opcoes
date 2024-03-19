@@ -11,24 +11,7 @@ root_folder = 'C:/Users/BLA/Desktop/HIST_DATA/_Base_ticks/'
 
 # Variáveis para obtenção de dados tick a tick
 # Lista IBOV por ordem de participação do índice
-def listar_opcoes(ativo):
-    lista_opcoes_vencimentos=[]
-    url = f'https://opcoes.net.br/listaopcoes/completa?au=False&uinhc=0&idLista=ML&idAcao={ativo}&listarVencimentos=true'
-    r = requests.get(url).json()
-    for linha in r['data']['cotacoesOpcoes']:
-            name = linha[0]
-            lista_opcoes_vencimentos.append(name)
-  
 
-    # Print the list of names
-    return(lista_opcoes_vencimentos)
-
-asset_list=listar_opcoes('PETR4')
-
-#asset_list = [
-#'VALE3',
-#'ITUB4',
-#'PETR4']
 
 
 start_date = datetime.datetime(2020, 1, 1, tzinfo=timezone)
@@ -52,7 +35,25 @@ if not mt5.initialize():
     print('Conexão falhou. Código de erro: ', mt5.last_error())
     quit()
 else:
+
+    lista_opcoes_vencimentos=[]
+    symbols=mt5.symbols_get()
+    
+    if symbols is not None:
+      
+     filtered_symbol = [symbol.name for symbol in symbols if symbol.name.startswith("PETR")]
+     for symbol_name in filtered_symbol:
+        lista_opcoes_vencimentos.append(symbol_name)
+    asset_list=lista_opcoes_vencimentos        
+#asset_list = [
+#'VALE3',
+#'ITUB4',
+#'PETRA142']
+   # print(asset_list)
+
+    
     for asset in asset_list:
+        #print(asset)
         # Criar pasta do ativo se não existir
         assetTickDataPath = root_folder + asset + '/'
         isExist = os.path.exists(assetTickDataPath)
@@ -61,7 +62,7 @@ else:
 
         symbol_sel = mt5.symbol_select(asset,True)
         if not symbol_sel:
-            print('Ativo não pode ser selecionado: ', asset)
+           # print('Ativo não pode ser selecionado: ', asset)
             mt5.shutdown()
         else:
             hist_date = start_date
