@@ -5,7 +5,7 @@ def listar_opcoes(ativo):
     url = f'https://opcoes.net.br/listaopcoes/completa?au=False&uinhc=0&idLista=ML&idAcao={ativo}&listarVencimentos=true'
     r = requests.get(url).json()
     for linha in r['data']['cotacoesOpcoes']:
-            name = linha[0]
+            name = linha[0].rstrip('_2024')
             lista_opcoes_vencimentos.append(name)
   
 
