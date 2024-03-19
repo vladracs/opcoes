@@ -1,11 +1,15 @@
 import requests
 
 def listar_opcoes(ativo):
+    lista_opcoes_vencimentos=[]
     url = f'https://opcoes.net.br/listaopcoes/completa?au=False&uinhc=0&idLista=ML&idAcao={ativo}&listarVencimentos=true'
     r = requests.get(url).json()
     for linha in r['data']['cotacoesOpcoes']:
-            print(linha[0] )
-    #l = [[ativo],veni[0].split('_')[0]]
-    #return pd.DataFrame(l,columns=['ativo'])
+            name = linha[0]
+            lista_opcoes_vencimentos.append(name)
+  
 
-listar_opcoes('PETR4')
+    # Print the list of names
+    return(lista_opcoes_vencimentos)
+
+print(listar_opcoes('PETR4'))
