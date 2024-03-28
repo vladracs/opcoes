@@ -97,7 +97,7 @@ def fetch_data_for_basis(target_temp, symbols):
                 #print("high vol")
                 message=f'{target}, {basis}, {option_right}, Strike = {option_strike}, Exp = {option_expiration}, {t_ts} ,Preço {c},Volume cash R$ {int(volume_cash):,}'
                 #print(message)
-                send_telegram_message(message,"1591875794",'7182990746:AAF_0Yjb9MixxG2xeP7per5IHYWVVW8ihdY')
+                send_telegram_message(message,"X",'X')
         
                # csv_data=(f'{target}, {basis}, {option_right}, {option_mode}, Strike = {option_strike}, Exp = {option_expiration}, {t_ts} , c={c:.2f}, Volume R$ {int(volume_cash):,}')
                 #print(csv_data)
