@@ -4,6 +4,28 @@ import os
 import MetaTrader5 as mt5
 from concurrent.futures import ThreadPoolExecutor
 import sys
+import requests
+import json
+
+def send_telegram_message(message: str,
+                          chat_id: str,
+                          api_key: str
+                          ):
+    responses = {}
+
+    headers = {'Content-Type': 'application/json',
+                   'Proxy-Authorization': 'Basic base64'}
+    data_dict = {'chat_id': chat_id,
+                     'text': message,
+                     'parse_mode': 'HTML',
+                     'disable_notification': True}
+    data = json.dumps(data_dict)
+    url = f'https://api.telegram.org/bot{api_key}/sendMessage'
+    response = requests.post(url,
+                                 data=data,
+                                 headers=headers,
+                                 verify=False)
+    return response
 
 def fetch_data_for_basis(target_temp, symbols):
     """
@@ -29,6 +51,7 @@ def fetch_data_for_basis(target_temp, symbols):
         option_mode_value = symbol_info_dict['option_mode'] # int
         option_right_value = symbol_info_dict['option_right'] # int
         option_strike_value = symbol_info_dict['option_strike']
+        
         option_expiration_time_value = symbol_info_dict['expiration_time']
         symbol_path = symbol_info_dict['path'].strip()
 
@@ -45,12 +68,14 @@ def fetch_data_for_basis(target_temp, symbols):
 
         # Fetch data for the last hour
         #date_to = datetime.now().replace(tzinfo=timezone.utc)  # Ensure datetime is timezone-aware
-        #date_from = date_to - timedelta(hours=4)
+        #print (date_to)
+        #date_from = date_to - timedelta(days=1)
+        #print (date_from)
         date_from = datetime(2024, 3, 27, hour=1)
-        date_to = datetime(2024, 3, 27, hour=23)
+        date_to = datetime(2024, 3, 27, hour=20)
 
         
-        candles = mt5.copy_rates_range(target, mt5.TIMEFRAME_M15, date_from, date_to)
+        candles = mt5.copy_rates_range(target, mt5.TIMEFRAME_M5, date_from, date_to)
         #print(candles)
         if candles is None:
             print(f"\n{target} has 0 candles\n")
@@ -69,7 +94,9 @@ def fetch_data_for_basis(target_temp, symbols):
             volume_cash = c * volume_real
             #print(volume_cash)
             if volume_cash > 500000:
+                #print("high vol")
                 message=f'{target}, {basis}, {option_right}, Strike = {option_strike}, Exp = {option_expiration}, {t_ts} ,Preço {c},Volume cash R$ {int(volume_cash):,}'
+                #print(message)
                 send_telegram_message(message,"1591875794",'7182990746:AAF_0Yjb9MixxG2xeP7per5IHYWVVW8ihdY')
         
                # csv_data=(f'{target}, {basis}, {option_right}, {option_mode}, Strike = {option_strike}, Exp = {option_expiration}, {t_ts} , c={c:.2f}, Volume R$ {int(volume_cash):,}')
@@ -78,6 +105,9 @@ def fetch_data_for_basis(target_temp, symbols):
 
 def main():
     start_time = datetime.now()
+    message=str(start_time)
+    
+    send_telegram_message(message,"1591875794",'7182990746:AAF_0Yjb9MixxG2xeP7per5IHYWVVW8ihdY')
     if not mt5.initialize():
         print("initialize() failed")
         mt5.shutdown()
